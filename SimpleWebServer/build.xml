@@ -1,0 +1,27 @@
+<project name="SimpleWebServer">
+    <description>
+            simple ant build file for SimpleWebServer
+    </description>
+
+    <property name="src" location="src"/>
+    <property name="bin" location="bin"/>
+
+    <target name="init">
+        <mkdir dir="${bin}"/>
+    </target>
+    
+    <target name="compile" depends="init">
+        <javac srcdir="${src}" destdir="${bin}"/>
+    </target>
+    
+<!--    <target name="compile" description="compile the source">-->
+<!--        <javac srcdir="${src}" destdir="${build}"/>-->
+<!--    </target>-->
+
+    <target name="run" depends="compile">
+        <java classname="edu.nmsu.cs.webserver.WebServer">
+            <classpath path="${bin}"/>
+        </java>
+    </target>
+
+</project>
