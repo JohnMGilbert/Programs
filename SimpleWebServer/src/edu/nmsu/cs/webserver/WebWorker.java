@@ -22,6 +22,8 @@ package edu.nmsu.cs.webserver;
  **/
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -34,6 +36,11 @@ public class WebWorker implements Runnable
 {
 
 	private Socket socket;
+	private File currFile = null;
+	private boolean fileExists = false;
+	private boolean fileRequested = false;
+	private boolean fileError = false;
+	// TODO: add boolean in case no filepath is given
 
 	/**
 	 * Constructor: must have a valid open socket
@@ -55,12 +62,40 @@ public class WebWorker implements Runnable
 		{
 			InputStream is = socket.getInputStream();
 			OutputStream os = socket.getOutputStream();
-			readHTTPRequest(is);
+			
+			// This is where all to work for the assignment happens.
+			String filePath = readHTTPRequest(is, os);
+			
+			
+			// access file
+
+			if (filePath != null) {
+				boolean fileExists = true;
+				String [] pathName = filePath.split(" ");
+				filePath = pathName[1];
+				currFile = new File(filePath);
+			}
+			
+
+			try {
+				BufferedReader r = new BufferedReader(new FileReader("SimpleWebServer" + currFile));
+				String line = null;
+				fileExists = true;	
+			}
+			catch (Exception e)
+			{
+				System.out.println("*Request error: " + e);
+				fileExists = false;
+				fileError = true;
+			}
+				
 			writeHTTPHeader(os, "text/html");
-			writeContent(os);
+			writeContent(os, currFile);
 			os.flush();
 			socket.close();
 		}
+				
+			
 		catch (Exception e)
 		{
 			System.err.println("Output error: " + e);
@@ -72,9 +107,10 @@ public class WebWorker implements Runnable
 	/**
 	 * Read the HTTP request header.
 	 **/
-	private void readHTTPRequest(InputStream is)
+	private String readHTTPRequest(InputStream is, OutputStream os)
 	{
-		String line;
+		String line; 
+		String answer = null; // answer is what needs to be returned. 
 		BufferedReader r = new BufferedReader(new InputStreamReader(is));
 		while (true)
 		{
@@ -84,16 +120,25 @@ public class WebWorker implements Runnable
 					Thread.sleep(1);
 				line = r.readLine();
 				System.err.println("Request line: (" + line + ")");
+				
+				String [] lineSegs = line.split(" ");
+
+				if (lineSegs[0].equals("GET") && !lineSegs[1].equals("/")) {
+					answer = line;
+					fileRequested = true;
+				}
+				
 				if (line.length() == 0)
 					break;
 			}
 			catch (Exception e)
 			{
 				System.err.println("Request error: " + e);
+				
 				break;
 			}
 		}
-		return;
+		return answer;
 	}
 
 	/**
@@ -107,9 +152,17 @@ public class WebWorker implements Runnable
 	private void writeHTTPHeader(OutputStream os, String contentType) throws Exception
 	{
 		Date d = new Date();
+		System.out.println(d);
 		DateFormat df = DateFormat.getDateTimeInstance();
 		df.setTimeZone(TimeZone.getTimeZone("GMT"));
-		os.write("HTTP/1.1 200 OK\n".getBytes());
+		
+		// if state to check if file was found
+		
+		if (fileExists && fileRequested) os.write("HTTP/1.1 200 OK\n".getBytes());
+		
+		else if (fileRequested && !fileExists) os.write("HTTP/1.1 404 Not Found\n".getBytes());
+		else os.write("HTTP/1.1 200 OK\n".getBytes());
+		
 		os.write("Date: ".getBytes());
 		os.write((df.format(d)).getBytes());
 		os.write("\n".getBytes());
@@ -130,11 +183,40 @@ public class WebWorker implements Runnable
 	 * @param os
 	 *          is the OutputStream object to write to
 	 **/
-	private void writeContent(OutputStream os) throws Exception
+	private void writeContent(OutputStream os, File f) throws Exception
 	{
 		os.write("<html><head></head><body>\n".getBytes());
 		os.write("<h3>My web server works!</h3>\n".getBytes());
 		os.write("</body></html>\n".getBytes());
+		if (fileExists) {
+			try {
+			BufferedReader r = new BufferedReader(new FileReader("SimpleWebServer" + f));
+			String line = null;
+			while((line = r.readLine()) != null) {
+				// scan line with special command (1:27)
+				if (line.contains("<cs371date>")) {
+					String [] segs = line.split("<cs371date>");
+					Date now = new Date();
+					line = segs[0] + now + segs[1];
+					System.out.println(line);
+				}
+				if (line.contains("<cs371server>")) {
+					String [] segs = line.split("<cs371server>");
+					Date now = new Date();
+					line = segs[0] + "Z's Server" + segs[1];
+					System.out.println(line);
+				}
+				os.write(line.getBytes());
+				}
+			}
+		
+		catch (Exception e) {
+			fileError = true;
+			os.write("404 Not Found".getBytes());
+		}
+		}
+		System.out.println("fileError: " + fileError + "\t\tfileRequested: "+ fileRequested);
+		if (fileError && fileRequested) { os.write("404 Not Found".getBytes()); }
 	}
 
 } // end class
