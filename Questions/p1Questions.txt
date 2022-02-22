@@ -1,0 +1,7 @@
+Question 1: Estimated time - 1 hour and 45 minutes.
+Question 2: Thought/Design: ~5 minutes (I did not put much thought into it, just went for it.
+			    This was a mistake).
+	    Programming: 1 hour.
+	    Debugging: 1 hour.
+	    Total: 2 hours, five minutes.
+Question 3: Total accuracy: 16%

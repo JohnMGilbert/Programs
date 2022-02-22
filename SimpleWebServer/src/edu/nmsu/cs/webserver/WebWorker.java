@@ -84,7 +84,7 @@ public class WebWorker implements Runnable
 			}
 			catch (Exception e)
 			{
-				System.out.println("Request error: " + e);
+				System.out.println("*Request error: " + e);
 				fileExists = false;
 				fileError = true;
 			}
