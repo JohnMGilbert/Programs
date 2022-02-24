@@ -22,8 +22,13 @@ package edu.nmsu.cs.webserver;
  **/
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -57,6 +62,7 @@ public class WebWorker implements Runnable
 	 **/
 	public void run()
 	{
+		System.out.println("HELLO****");
 		System.err.println("Handling connection...");
 		try
 		{
@@ -109,6 +115,7 @@ public class WebWorker implements Runnable
 	 **/
 	private String readHTTPRequest(InputStream is, OutputStream os)
 	{
+		
 		String line; 
 		String answer = null; // answer is what needs to be returned. 
 		BufferedReader r = new BufferedReader(new InputStreamReader(is));
@@ -138,6 +145,18 @@ public class WebWorker implements Runnable
 				break;
 			}
 		}
+
+		try {
+			System.out.println("HELLO");
+			is = new FileInputStream("www/happy_dog.jpg");
+			sendFile(is, os);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			System.out.println("HELOOOOO");
+			e.printStackTrace();
+		}
+
+
 		return answer;
 	}
 
@@ -219,4 +238,22 @@ public class WebWorker implements Runnable
 		if (fileError && fileRequested) { os.write("404 Not Found".getBytes()); }
 	}
 
+	private void sendFile(InputStream is, OutputStream out){
+		byte[] buffer = new byte[1024];
+		int bytesRead;
+		int strCnt = 0;
+		try {
+			int cnt = 0;
+			while ((bytesRead = is.read(buffer)) != -1){
+				out.write(buffer, 0, bytesRead);
+			}
+			out.flush();
+			out.close();
+			is.close();
+		}
+		catch (IOException e)
+		{
+			
+		}
+	}
 } // end class
