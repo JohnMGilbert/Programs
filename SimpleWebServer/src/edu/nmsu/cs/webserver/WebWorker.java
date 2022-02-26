@@ -62,7 +62,6 @@ public class WebWorker implements Runnable
 	 **/
 	public void run()
 	{
-		System.out.println("HELLO****");
 		System.err.println("Handling connection...");
 		try
 		{
@@ -90,7 +89,7 @@ public class WebWorker implements Runnable
 			}
 			catch (Exception e)
 			{
-				System.out.println("*Request error: " + e);
+				System.out.println("Request error: " + e);
 				fileExists = false;
 				fileError = true;
 			}
@@ -99,6 +98,7 @@ public class WebWorker implements Runnable
 			writeContent(os, currFile);
 			os.flush();
 			socket.close();
+
 		}
 				
 			
@@ -146,15 +146,7 @@ public class WebWorker implements Runnable
 			}
 		}
 
-		try {
-			System.out.println("HELLO");
-			is = new FileInputStream("www/happy_dog.jpg");
-			sendFile(is, os);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			System.out.println("HELOOOOO");
-			e.printStackTrace();
-		}
+		
 
 
 		return answer;
@@ -217,13 +209,13 @@ public class WebWorker implements Runnable
 					String [] segs = line.split("<cs371date>");
 					Date now = new Date();
 					line = segs[0] + now + segs[1];
-					System.out.println(line);
+					
 				}
 				if (line.contains("<cs371server>")) {
 					String [] segs = line.split("<cs371server>");
 					Date now = new Date();
 					line = segs[0] + "Z's Server" + segs[1];
-					System.out.println(line);
+
 				}
 				os.write(line.getBytes());
 				}
