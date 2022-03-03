@@ -1,5 +1,6 @@
 package edu.nmsu.cs.webserver;
-
+import java.lang.Object;
+import java.nio.file.Files;
 /**
  * Web worker: an object of this class executes in its own new thread to receive and respond to a
  * single HTTP request. After the constructor the object executes on its "run" method, and leaves
@@ -60,7 +61,7 @@ public class WebWorker implements Runnable
 	 * destroys the thread. This method assumes that whoever created the worker created it with a
 	 * valid open socket object.
 	 **/
-	public void run()
+	public void run() // TODO: reconficure and organize this
 	{
 		System.err.println("Handling connection...");
 		try
@@ -70,7 +71,6 @@ public class WebWorker implements Runnable
 			
 			// This is where all to work for the assignment happens.
 			String filePath = readHTTPRequest(is, os);
-			
 			
 			// access file
 
@@ -93,9 +93,11 @@ public class WebWorker implements Runnable
 				fileExists = false;
 				fileError = true;
 			}
-				
-			writeHTTPHeader(os, "text/html");
-			writeContent(os, currFile);
+				// dynamically call this. Only do one.
+			//writeHTTPHeader(os, "text/html");
+			writeHTTPHeader(os, "image/jpeg");
+			writeImage(os, "happy_dog.jpg");
+			//writeContent(os, currFile);
 			os.flush();
 			socket.close();
 
@@ -132,6 +134,7 @@ public class WebWorker implements Runnable
 
 				if (lineSegs[0].equals("GET") && !lineSegs[1].equals("/")) {
 					answer = line;
+					
 					fileRequested = true;
 				}
 				
@@ -230,22 +233,19 @@ public class WebWorker implements Runnable
 		if (fileError && fileRequested) { os.write("404 Not Found".getBytes()); }
 	}
 
-	private void sendFile(InputStream is, OutputStream out){
-		byte[] buffer = new byte[1024];
-		int bytesRead;
-		int strCnt = 0;
+	private void writeImage(OutputStream out, String request) throws Exception{
+		
+		FileInputStream is = new FileInputStream(request);
 		try {
-			int cnt = 0;
-			while ((bytesRead = is.read(buffer)) != -1){
-				out.write(buffer, 0, bytesRead);
-			}
-			out.flush();
-			out.close();
-			is.close();
+			int arraysize = is.available();
+			byte bytes[] = new byte[arraysize];
+			is.read(bytes);
+			out.write(bytes);
 		}
-		catch (IOException e)
-		{
-			
+		catch (Exception e){
+			System.out.println("Error accessing Image: " + e.getMessage());
 		}
+
+
 	}
 } // end class
