@@ -46,6 +46,11 @@ public class WebWorker implements Runnable
 	private boolean fileExists = false;
 	private boolean fileRequested = false;
 	private boolean fileError = false;
+	public String dir = System.getProperty("user.dir") + "/www";
+	public String filePath;
+
+	public boolean isHTML = false, isGIF = false, isPNG = false, isJPEG = false;
+
 	// TODO: add boolean in case no filepath is given
 
 	/**
@@ -70,40 +75,39 @@ public class WebWorker implements Runnable
 			OutputStream os = socket.getOutputStream();
 			
 			// This is where all to work for the assignment happens.
-			String filePath = readHTTPRequest(is, os);
+			
+			System.out.println(dir);
+			filePath = readHTTPRequest(is, os);
 			
 			// access file
-
 			if (filePath != null) {
 				boolean fileExists = true;
 				String [] pathName = filePath.split(" ");
 				filePath = pathName[1];
+				System.out.println(filePath);
 				currFile = new File(filePath);
-			}
-			
+			}	
 
 			try {
-				BufferedReader r = new BufferedReader(new FileReader("SimpleWebServer" + currFile));
+				BufferedReader r = new BufferedReader(new FileReader(dir + currFile)); // ERROR HERE
 				String line = null;
 				fileExists = true;	
 			}
 			catch (Exception e)
 			{
-				System.out.println("Request error: " + e);
+				System.out.println("Request error 1: " + e);
 				fileExists = false;
 				fileError = true;
 			}
 				// dynamically call this. Only do one.
 			//writeHTTPHeader(os, "text/html");
-			writeHTTPHeader(os, "image/jpeg");
-			writeImage(os, "happy_dog.jpg");
-			//writeContent(os, currFile);
+			writeHTTPHeader(os, getContentType(filePath));
+			//writeImage(os, filePath);
+			writeContent(os, currFile);
 			os.flush();
 			socket.close();
 
-		}
-				
-			
+		}	
 		catch (Exception e)
 		{
 			System.err.println("Output error: " + e);
@@ -117,7 +121,6 @@ public class WebWorker implements Runnable
 	 **/
 	private String readHTTPRequest(InputStream is, OutputStream os)
 	{
-		
 		String line; 
 		String answer = null; // answer is what needs to be returned. 
 		BufferedReader r = new BufferedReader(new InputStreamReader(is));
@@ -129,12 +132,10 @@ public class WebWorker implements Runnable
 					Thread.sleep(1);
 				line = r.readLine();
 				System.err.println("Request line: (" + line + ")");
-				
 				String [] lineSegs = line.split(" ");
 
 				if (lineSegs[0].equals("GET") && !lineSegs[1].equals("/")) {
-					answer = line;
-					
+					answer = line;	
 					fileRequested = true;
 				}
 				
@@ -143,15 +144,10 @@ public class WebWorker implements Runnable
 			}
 			catch (Exception e)
 			{
-				System.err.println("Request error: " + e);
-				
+				System.err.println("Request error: " + e);	
 				break;
 			}
 		}
-
-		
-
-
 		return answer;
 	}
 
@@ -199,53 +195,64 @@ public class WebWorker implements Runnable
 	 **/
 	private void writeContent(OutputStream os, File f) throws Exception
 	{
-		os.write("<html><head></head><body>\n".getBytes());
-		os.write("<h3>My web server works!</h3>\n".getBytes());
-		os.write("</body></html>\n".getBytes());
-		if (fileExists) {
-			try {
-			BufferedReader r = new BufferedReader(new FileReader("SimpleWebServer" + f));
-			String line = null;
-			while((line = r.readLine()) != null) {
-				// scan line with special command (1:27)
-				if (line.contains("<cs371date>")) {
-					String [] segs = line.split("<cs371date>");
-					Date now = new Date();
-					line = segs[0] + now + segs[1];
-					
-				}
-				if (line.contains("<cs371server>")) {
-					String [] segs = line.split("<cs371server>");
-					Date now = new Date();
-					line = segs[0] + "Z's Server" + segs[1];
+			
+		if (isHTML) {
 
+			os.write("<html><head></head><body>\n".getBytes());
+			os.write("<h3>My web server works!</h3>\n".getBytes());
+			os.write("</body></html>\n".getBytes());
+
+			if (fileExists) {
+				try {
+				BufferedReader r = new BufferedReader(new FileReader(dir + f));
+				String line = null;
+				while((line = r.readLine()) != null) {
+					// scan line with special command (1:27)
+					if (line.contains("<cs371date>")) {
+						String [] segs = line.split("<cs371date>");
+						Date now = new Date();
+						line = segs[0] + now + segs[1];
+						
+					}
+					if (line.contains("<cs371server>")) {
+						String [] segs = line.split("<cs371server>");
+						Date now = new Date();
+						line = segs[0] + "Z's Server" + segs[1];
+
+					}
+					os.write(line.getBytes());
+					}
 				}
-				os.write(line.getBytes());
+				catch (Exception e) {
+					fileError = true;
+					//os.write("404 Not Found".getBytes());
 				}
 			}
-		
-		catch (Exception e) {
-			fileError = true;
-			os.write("404 Not Found".getBytes());
 		}
+		if (isGIF || isJPEG || isPNG) {
+			FileInputStream is = new FileInputStream(dir +filePath);
+			try {
+				int arraysize = is.available();
+				byte bytes[] = new byte[arraysize];
+				is.read(bytes);
+				os.write(bytes);
+				is.close();
+			}
+			catch (Exception e){
+				System.out.println("Error accessing Image: " + e.getMessage());
+			}
 		}
-		System.out.println("fileError: " + fileError + "\t\tfileRequested: "+ fileRequested);
+
+		else {System.err.println("SOMETHING WRONG HERE");}
+
 		if (fileError && fileRequested) { os.write("404 Not Found".getBytes()); }
 	}
 
-	private void writeImage(OutputStream out, String request) throws Exception{
-		
-		FileInputStream is = new FileInputStream(request);
-		try {
-			int arraysize = is.available();
-			byte bytes[] = new byte[arraysize];
-			is.read(bytes);
-			out.write(bytes);
-		}
-		catch (Exception e){
-			System.out.println("Error accessing Image: " + e.getMessage());
-		}
-
-
+	private String getContentType(String path){
+		if (path.contains("html")) { isHTML=true; return "text/html";}
+		if (path.contains("gif")) { isGIF = true; return "image/gif";}
+		if (path.contains("png")) { isPNG = true; return "image/png";}
+		if (path.contains("jpeg") || path.contains("jpg")) { isJPEG = true; return "image/jpeg";}
+		else return null;
 	}
 } // end class
