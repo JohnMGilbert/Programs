@@ -13,6 +13,8 @@ package edu.nmsu.cs.webserver;
  * 
  * @author Jon Cook, Ph.D.
  * 
+ * http://localhost:8080/res/acc/test.html
+ * 
  **/
 import java.net.ServerSocket;
 import java.net.Socket;
