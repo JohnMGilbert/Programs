@@ -5,7 +5,6 @@
 
     <property name="src" location="src"/>
     <property name="bin" location="bin"/>
-    <property name="www" location="www"/>
 
     <target name="clean">
         <delete dir="${bin}"/>
@@ -29,9 +28,5 @@
         <mkdir dir="${www}"/>
     </target>
 
-    
-   <!-- <target name="compile" description="compile the source">-->
-<!--        <javac srcdir="${src}" destdir="${build}"/>-->
-<!--    </target> -->
 
 </project>
