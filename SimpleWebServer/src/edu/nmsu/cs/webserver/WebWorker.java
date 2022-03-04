@@ -46,7 +46,7 @@ public class WebWorker implements Runnable
 	private boolean fileExists = false;
 	private boolean fileRequested = false;
 	private boolean fileError = false;
-	public String dir = System.getProperty("user.dir") + "/www";
+	public String dir = System.getProperty("user.dir");
 	public String filePath;
 
 	public boolean isHTML = false, isGIF = false, isPNG = false, isJPEG = false;
@@ -198,7 +198,9 @@ public class WebWorker implements Runnable
 			
 		if (isHTML) {
 
-			os.write("<html><head></head><body>\n".getBytes());
+			os.write("<html><head>".getBytes());
+			os.write("<link rel=\"icon\" type=\"image/x-icon\" href=\"/www/favicon.ico\">".getBytes());
+			os.write("</head><body>\n".getBytes());
 			os.write("<h3>My web server works!</h3>\n".getBytes());
 			os.write("</body></html>\n".getBytes());
 
@@ -254,5 +256,9 @@ public class WebWorker implements Runnable
 		if (path.contains("png")) { isPNG = true; return "image/png";}
 		if (path.contains("jpeg") || path.contains("jpg")) { isJPEG = true; return "image/jpeg";}
 		else return null;
+	}
+
+	private static void addFavicon(){
+
 	}
 } // end class
