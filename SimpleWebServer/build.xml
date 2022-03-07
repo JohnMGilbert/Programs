@@ -19,14 +19,9 @@
     </target>
 
     <target name="run" depends="compile">
-        <java classname="edu.nmsu.cs.webserver.WebServer">
+        <java fork="true" dir="www" classname="edu.nmsu.cs.webserver.WebServer">
             <classpath path="${bin}"/>
         </java>
     </target>
-
-    <target name="www" depends="compile">
-        <mkdir dir="${www}"/>
-    </target>
-
 
 </project>
