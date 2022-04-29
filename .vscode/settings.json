@@ -1,3 +1,12 @@
 {
-    "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx4G -Xms100m"
+    "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx4G -Xms100m",
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "/Users/johngilbert/Downloads/hamcrest-core-1.3.jar",
+        "/Users/johngilbert/Downloads/junit-4.13.2.jar"
+    ],
+    "java.project.sourcePaths": [
+        "Coverage/src",
+        "Circles/src/edu/nmsu/cs/circles"
+    ]
 }
