@@ -43,10 +43,12 @@ public class Circle1Test
 	 */
 	@Test
 	public void testScaleBigger() {
+		System.out.println("Running Test: scales bigger properly");
 		Circle1 cA = new Circle1(0,0,10);
 		Circle1 cB = new Circle1(0, 0, 10);
 		cA.radius = cA.scale(1.5);
 		Assert.assertFalse(cA.radius == cB.radius);
+		Assert.assertTrue(cA.radius > cB.radius);
 	}
 
 	/**
@@ -54,10 +56,25 @@ public class Circle1Test
 	 */
 	@Test
 	public void testScaleSmaller() {
+		System.out.println("Running Test: scales smaller properly");
 		Circle1 cA = new Circle1(0,0,10);
 		Circle1 cB = new Circle1(0, 0, 10);
 		cA.radius = cA.scale(0.5);
-		Assert.assertFalse(cA.center == cB.center);
+		Assert.assertFalse(cA.radius == cB.radius);
+		Assert.assertTrue(cA.radius < cB.radius);
+	}
+
+	/**
+	 * Test scale with negative number
+	 */
+	@Test
+	public void testScaleWithNeg() {
+		System.out.println("Running test: scales with negative number");
+		Circle1 cA = new Circle1(0,0,10);
+		Circle1 cB = new Circle1(0, 0, 10);
+		cA.radius = cA.scale(-0.5);
+		Assert.assertFalse(cA.radius == cB.radius);
+		Assert.assertTrue(cA.radius < cB.radius);
 	}
 
 	/**
@@ -128,8 +145,8 @@ public class Circle1Test
 	{
 		Point p;
 		System.out.println("Running test simpleMove.");
-		p = circle1.moveBy(1, 1);
-		Assert.assertTrue(p.x == 2 && p.y == 3);
+		p = circle1.moveBy(1, 2);
+		Assert.assertTrue(p.x == 2 && p.y == 4);
 	}
 
 	//
@@ -140,31 +157,31 @@ public class Circle1Test
 	{
 		Point p;
 		System.out.println("Running test simpleMoveNeg.");
-		p = circle1.moveBy(-1, -1);
-		Assert.assertTrue(p.x == 0 && p.y == 1);
+		p = circle1.moveBy(-1, -2);
+		Assert.assertTrue(p.x == 0 && p.y == 0);
 	}
 
 	/**
 	 * Test no move to the same position (no move)
 	 */
-	// @Test
-	// public void moveToSamePosition() {
-	// 	Point p;
-	// 	Point q;
-	// 	System.out.println("Running test: move to same position.");
-	// 	p = circle1.moveBy(0, 0);
-	// 	Assert.assertTrue(p.x == 0 && p.y == 0);
-	// }
+	@Test
+	public void moveToSamePosition() {
+		Point p;
+		System.out.println("Running test: move to same position.");
+		p = circle1.moveBy(0, 0);
+		Assert.assertTrue(p.x == 1 && p.y == 2);
+	}
 
 	/**
-	 * Test that cicle scales
+	 * Test that cicle scales and doesn't change center
 	 */
-	// @Test
-	// public void testCirlceScale() {
-	// 	Circle1 cA = new Circle1(0, 0, 10);
-	// 	cA.scale(10);
-	// 	Assert.assertTrue(cA.center.x == 0 && cA.center.y == 0);
-	// }
+	@Test
+	public void testCirlceScale() {
+		System.out.println("Running Test: Circle center does not change with scaling ");
+		Circle1 cA = new Circle1(0, 0, 10);
+		cA.scale(10);
+		Assert.assertTrue(cA.center.x == 0 && cA.center.y == 0);
+	}
 
 	/***
 	 * NOT USED public static void main(String args[]) { try { org.junit.runner.JUnitCore.runClasses(

@@ -17,7 +17,7 @@ import edu.nmsu.cs.circles.Point;
 public class Circle2Test
 {
 	// Data you need for each test case
-	private Circle2 Circle2;
+	private Circle2 circle2;
 
 	//
 	// Stuff you want to do before each test case
@@ -26,7 +26,7 @@ public class Circle2Test
 	public void setup()
 	{
 		System.out.println("\nTest starting...");
-		Circle2 = new Circle2(1, 2, 3);
+		circle2 = new Circle2(1, 2, 3);
 	}
 
 	//
@@ -36,6 +36,45 @@ public class Circle2Test
 	public void teardown()
 	{
 		System.out.println("\nTest finished.");
+	}
+
+	/**
+	 * Test scale, that circle gets bigger
+	 */
+	@Test
+	public void testScaleBigger() {
+		System.out.println("Running Test: scales bigger properly");
+		Circle2 cA = new Circle2(0,0,10);
+		Circle2 cB = new Circle2(0, 0, 10);
+		cA.radius = cA.scale(1.5);
+		Assert.assertFalse(cA.radius == cB.radius);
+		Assert.assertTrue(cA.radius > cB.radius);
+	}
+
+	/**
+	 * Test scale, that circle gets smaller
+	 */
+	@Test
+	public void testScaleSmaller() {
+		System.out.println("Running Test: scales smaller properly");
+		Circle2 cA = new Circle2(0,0,10);
+		Circle2 cB = new Circle2(0, 0, 10);
+		cA.radius = cA.scale(0.5);
+		Assert.assertFalse(cA.radius == cB.radius);
+		Assert.assertTrue(cA.radius < cB.radius);
+	}
+
+	/**
+	 * Test scale with negative number
+	 */
+	@Test
+	public void testScaleWithNeg() {
+		System.out.println("Running test: scales with negative number");
+		Circle2 cA = new Circle2(0,0,10);
+		Circle2 cB = new Circle2(0, 0, 10);
+		cA.radius = cA.scale(-0.5);
+		Assert.assertFalse(cA.radius == cB.radius);
+		Assert.assertTrue(cA.radius < cB.radius);
 	}
 
 	/**
@@ -86,6 +125,18 @@ public class Circle2Test
 		Assert.assertTrue(cB.intersects(cA));
 	}
 
+	/**
+	 * Test intersection at multiple points
+	 */
+	@Test
+	public void testTwoPointIntersection(){
+		System.out.println("Running Test: Interesction at two points");
+		Circle2 cA = new Circle2(0, 0, 10);
+		Circle2 cB = new Circle2(5, 0, 10);
+		Assert.assertTrue(cA.intersects(cB));
+		Assert.assertTrue(cB.intersects(cA));
+	}
+
 	//
 	// Test a simple positive move
 	//
@@ -94,8 +145,8 @@ public class Circle2Test
 	{
 		Point p;
 		System.out.println("Running test simpleMove.");
-		p = Circle2.moveBy(1, 1);
-		Assert.assertTrue(p.x == 2 && p.y == 3);
+		p = circle2.moveBy(1, 2);
+		Assert.assertTrue(p.x == 2 && p.y == 4);
 	}
 
 	//
@@ -106,31 +157,31 @@ public class Circle2Test
 	{
 		Point p;
 		System.out.println("Running test simpleMoveNeg.");
-		p = Circle2.moveBy(-1, -1);
-		Assert.assertTrue(p.x == 0 && p.y == 1);
+		p = circle2.moveBy(-1, -2);
+		Assert.assertTrue(p.x == 0 && p.y == 0);
 	}
 
 	/**
 	 * Test no move to the same position (no move)
 	 */
-	// @Test
-	// public void moveToSamePosition() {
-	// 	Point p;
-	// 	Point q;
-	// 	System.out.println("Running test: move to same position.");
-	// 	p = Circle2.moveBy(0, 0);
-	// 	Assert.assertTrue(p.x == 0 && p.y == 0);
-	// }
+	@Test
+	public void moveToSamePosition() {
+		Point p;
+		System.out.println("Running test: move to same position.");
+		p = circle2.moveBy(0, 0);
+		Assert.assertTrue(p.x == 1 && p.y == 2);
+	}
 
 	/**
-	 * Test that cicle scales
+	 * Test that cicle scales and doesn't change center
 	 */
-	// @Test
-	// public void testCirlceScale() {
-	// 	Circle2 cA = new Circle2(0, 0, 10);
-	// 	cA.scale(10);
-	// 	Assert.assertTrue(cA.center.x == 0 && cA.center.y == 0);
-	// }
+	@Test
+	public void testCirlceScale() {
+		System.out.println("Running Test: Circle center does not change with scaling ");
+		Circle2 cA = new Circle2(0, 0, 10);
+		cA.scale(10);
+		Assert.assertTrue(cA.center.x == 0 && cA.center.y == 0);
+	}
 
 	/***
 	 * NOT USED public static void main(String args[]) { try { org.junit.runner.JUnitCore.runClasses(
